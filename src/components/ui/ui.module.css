@@ -1,0 +1,186 @@
+/* 공통 UI 프리미티브 스타일 — 디자인 토큰 기반. */
+
+/* ---------- Button ---------- */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  border: 2px solid transparent;
+  border-radius: var(--radius-md);
+  font-family: var(--font-sans);
+  font-weight: var(--fw-bold);
+  cursor: pointer;
+  white-space: nowrap;
+  transition: background var(--duration-fast) var(--ease-standard),
+    border-color var(--duration-fast) var(--ease-standard),
+    transform var(--duration-fast) var(--ease-bounce),
+    box-shadow var(--duration-fast) var(--ease-standard);
+}
+.btn:active {
+  transform: scale(0.98);
+}
+.btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+.btn:disabled:active {
+  transform: none;
+}
+.block {
+  width: 100%;
+}
+
+/* sizes */
+.md {
+  min-height: 44px;
+  padding: 0 16px;
+  font-size: var(--fs-body-sm);
+}
+.lg {
+  min-height: 52px;
+  padding: 0 22px;
+  font-size: var(--fs-body);
+}
+
+/* variants */
+.primary {
+  background: var(--color-primary);
+  color: var(--text-on-primary);
+}
+.primary:hover:not(:disabled) {
+  background: var(--color-primary-hover);
+  box-shadow: var(--shadow-primary);
+}
+.secondary {
+  background: var(--surface-card);
+  border-color: var(--border-default);
+  color: var(--text-strong);
+}
+.secondary:hover:not(:disabled) {
+  border-color: var(--color-primary);
+  color: var(--color-primary);
+}
+.ghost {
+  background: transparent;
+  color: var(--text-medium);
+}
+.ghost:hover:not(:disabled) {
+  background: var(--surface-sunken);
+  color: var(--text-strong);
+}
+
+/* ---------- Input ---------- */
+.field {
+  display: grid;
+  gap: 6px;
+}
+.label {
+  font: var(--text-body-strong);
+  color: var(--text-strong);
+}
+.req {
+  color: var(--color-primary);
+  margin-left: 2px;
+}
+.input {
+  font: var(--text-body);
+  font-family: var(--font-sans);
+  height: 48px;
+  padding: 0 14px;
+  border: 2px solid var(--border-default);
+  border-radius: var(--radius-md);
+  background: var(--surface-card);
+  color: var(--text-strong);
+  width: 100%;
+  outline: none;
+  transition: border-color var(--duration-fast) var(--ease-standard);
+}
+.input::placeholder {
+  color: var(--text-weak);
+}
+.input:focus {
+  border-color: var(--border-focus);
+}
+.help {
+  font: var(--text-caption);
+  color: var(--text-weak);
+}
+
+/* ---------- Switch ---------- */
+.switch {
+  position: relative;
+  width: 48px;
+  height: 28px;
+  flex: none;
+  border-radius: 999px;
+  border: none;
+  background: var(--gray-300);
+  cursor: pointer;
+  transition: background var(--duration-base) var(--ease-standard);
+}
+.switch[data-on="true"] {
+  background: var(--color-primary);
+}
+.switch::after {
+  content: "";
+  position: absolute;
+  top: 3px;
+  left: 3px;
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  background: #fff;
+  box-shadow: var(--shadow-sm);
+  transition: transform var(--duration-base) var(--ease-bounce);
+}
+.switch[data-on="true"]::after {
+  transform: translateX(20px);
+}
+
+/* ---------- PinInput ---------- */
+.pin {
+  display: flex;
+  gap: 10px;
+}
+.pinCell {
+  width: 52px;
+  height: 60px;
+  text-align: center;
+  font: var(--fw-bold) var(--fs-h2) / 1 var(--font-sans);
+  border: 2px solid var(--border-default);
+  border-radius: var(--radius-md);
+  background: var(--surface-card);
+  color: var(--text-strong);
+  outline: none;
+  transition: border-color var(--duration-fast) var(--ease-standard);
+}
+.pinCell:focus {
+  border-color: var(--border-focus);
+}
+.pinErr .pinCell {
+  border-color: var(--vote-no);
+}
+
+/* ---------- StepIndicator ---------- */
+.steps {
+  display: flex;
+  gap: 6px;
+  align-items: center;
+}
+.stepDot {
+  height: 6px;
+  flex: 1;
+  border-radius: 999px;
+  background: var(--gray-200);
+  transition: background var(--duration-base) var(--ease-standard);
+}
+.stepDot[data-state="done"] {
+  background: var(--color-primary);
+}
+.stepDot[data-state="current"] {
+  background: var(--color-primary);
+}
+.stepDot[data-state="todo"] {
+  background: var(--gray-200);
+}

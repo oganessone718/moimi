@@ -1,0 +1,72 @@
+.card {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 14px;
+  background: var(--surface-card);
+  border: 2px solid var(--border-subtle);
+  border-radius: var(--radius-lg);
+}
+.card[data-selected="true"] {
+  border-color: var(--indigo-300);
+  box-shadow: var(--shadow-md);
+}
+.emoji {
+  font-size: 26px;
+  width: 44px;
+  height: 44px;
+  flex: none;
+  display: grid;
+  place-items: center;
+  background: var(--gray-50);
+  border-radius: var(--radius-md);
+}
+.body {
+  flex: 1;
+  min-width: 0;
+}
+.name {
+  font: var(--text-body-strong);
+  color: var(--text-strong);
+}
+.desc {
+  font: var(--text-body-sm);
+  color: var(--text-medium);
+  margin-top: 2px;
+}
+.meta {
+  font: var(--text-caption);
+  color: var(--text-weak);
+  margin-top: 3px;
+}
+.actions {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex: none;
+}
+.like,
+.comment,
+.remove {
+  border: 1px solid var(--border-subtle);
+  background: var(--surface-card);
+  border-radius: var(--radius-full);
+  padding: 6px 10px;
+  font: var(--fw-semibold) var(--fs-caption) / 1 var(--font-sans);
+  color: var(--text-medium);
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+}
+.like[data-on="true"] {
+  border-color: var(--accent-300);
+  color: var(--accent-600);
+}
+.remove {
+  border-color: transparent;
+  color: var(--text-weak);
+}
+.remove:hover {
+  color: var(--vote-no-text);
+}

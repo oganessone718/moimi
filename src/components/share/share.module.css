@@ -1,0 +1,31 @@
+.kakao,
+.copy {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  width: 100%;
+  min-height: 52px;
+  border-radius: var(--radius-md);
+  font: var(--fw-bold) var(--fs-body) / 1 var(--font-sans);
+  cursor: pointer;
+  border: 2px solid transparent;
+  transition: filter var(--duration-fast) var(--ease-standard),
+    border-color var(--duration-fast) var(--ease-standard);
+}
+.kakao {
+  background: var(--kakao-yellow);
+  color: var(--kakao-label);
+}
+.kakao:hover {
+  filter: brightness(0.96);
+}
+.copy {
+  background: var(--surface-card);
+  border-color: var(--border-default);
+  color: var(--text-strong);
+}
+.copy:hover {
+  border-color: var(--color-primary);
+  color: var(--color-primary);
+}
