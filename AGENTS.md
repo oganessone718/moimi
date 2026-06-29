@@ -33,9 +33,10 @@ src/lib/{db,auth,kakao,geo}
 src/server                 도메인 로직(투표 집계·확정 등)
 ```
 
-## 트랙 분리
-- **이 repo 세션 = 셋업/인프라/백엔드 중심.** UI 화면 구현은 **디자인 트랙**(`docs/prompts/` → Claude Design)에서 진행.
-- shadcn 컴포넌트 대량 설치·화면 마크업은 디자인 트랙 산출물과 합류할 때 한다.
+## 트랙 / 디자인 소스
+- 디자인은 **Claude Design 프로젝트**(design-system, 킷 `ui_kits/moimi`)에서 나온다. 화면: Landing / CreateWizard / 게스트응답 / Results / Confirmed. 디자인 토큰·컴포넌트가 **시각 SSOT**.
+- **이 repo에서 그 디자인을 구현**한다(토큰 → globals, 컴포넌트 → `src/components`, 화면 → App Router). "대략적 프레임/UI 참고" 수준 — 픽셀 일치보다 구조·토큰 충실.
+- 기획(PLAN)과 디자인이 어긋나면 **디자인 기준으로 reconcile** 후 PLAN/DECISIONS에 기록(D14).
 
 ## 보안 설계 원칙 (PLAN §2.1, §4.3)
 - 게스트/관리자(무가입) 경로의 1차 방어선은 **서버 액션 검증**(shareToken·PIN 직접 검증). RLS에 의존하지 않는다.

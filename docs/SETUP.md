@@ -33,12 +33,13 @@
 > ⚠️ PoC ②의 핵심: Supabase Auth는 Kakao를 **공식 OAuth provider로 지원하지 않을 수 있음**(부록 A). 두 경로 중 택1을 PoC에서 확정:
 > - (A) Supabase Auth Custom OAuth / 또는 Kakao를 OIDC로 연결
 > - (B) Auth.js(NextAuth) Kakao provider 폴백 (PLAN §9 리스크 완화)
-> 로그인은 **선택 기능(S9)** 이라 크리티컬 패스 아님 — 막히면 구글만으로도 v1 진행 가능.
+> 로그인은 **선택 기능(S9)** 이라 크리티컬 패스 아님 — 막혀도 v1은 무가입 게스트로 진행 가능.
 
 ## 3. Supabase ↔ 소셜 로그인 provider ☐
-1. ☐ Supabase → Authentication → Providers → **Google** 활성화 (Google Cloud OAuth 클라이언트 발급 → client id/secret 입력)
-2. ☐ **Kakao**: 위 2-4 경로(A/B) 결정에 따라 설정. PoC ②에서 인앱 브라우저 리다이렉트까지 실제 폰으로 확인.
-3. ☐ Authentication → URL Configuration: Site URL + Redirect URLs에 로컬·배포 도메인 등록.
+> **v1은 카카오만** (D12). 구글은 v1.1 — **지금 Google Cloud OAuth 셋업은 생략**해도 됩니다(나중에 provider만 추가).
+1. ☐ **Kakao**: 위 2-4 경로(A/B) 결정에 따라 설정. PoC ②에서 인앱 브라우저 리다이렉트까지 실제 폰으로 확인.
+2. ☐ Authentication → URL Configuration: Site URL + Redirect URLs에 로컬·배포 도메인 등록.
+3. ⏳ (v1.1) **Google** 활성화 — Google Cloud OAuth 클라이언트 발급 → Supabase Providers에 client id/secret 입력. provider 목록에 버튼 1개 추가로 끝.
 
 ## 4. Vercel 배포 + 도메인 ☐
 1. ☐ Vercel에 이 repo 연결 (Framework: Next.js 자동감지)

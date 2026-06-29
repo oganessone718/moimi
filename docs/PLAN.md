@@ -102,16 +102,19 @@
 |---|------|------|
 | F1 | **장소 + 날짜/시간 동시 조율** | 핵심 차별점. 한 폴에서 날짜·시간·장소 후보를 함께 제안·투표 |
 | F2 | **무가입 게스트 참여 (기본 진입)** | URL+닉네임만으로 응답. 생성도 무가입 가능. 바이럴 핵심 (§2.1) |
-| F3 | **선택적 소셜 로그인** | 카카오·구글. 강제 아님 — 내 모임 대시보드·동기화·알림·닉네임 자동 등 보상 |
+| F3 | **선택적 소셜 로그인** | **v1은 카카오만** (구글 등은 v1.1, provider 추가형으로 확장). 강제 아님 — 내 모임 대시보드·동기화·알림·닉네임 자동 등 보상 |
 | F4 | **카톡 공유 (자동 멘트)** | "○○ 모임 일정 정해요! 👉 [링크]" 자동 생성, Kakao Share SDK |
 | F5 | **지도 위 장소 후보 시각화** | 후보 장소들을 지도 마커로 한눈에. 카카오맵 |
 | F6 | **출발지 → 중간지점 추천 (부가기능)** | **출발지 입력은 옵셔널** — 입력한 사람들의 centroid 계산 → 주변 장소 카테고리 추천. 미입력해도 폴 정상 동작. 당신이 원한 차별 부가기능 |
-| F7 | **시간대 조율** | 하루 약속 시 "7시 이후 가능" 식 시간 범위 응답 |
+| ~~F7~~ | ~~**시간대 조율**~~ → **v1.1** | "7시 이후 가능" 식 시간 범위. **디자인 reconcile로 MVP 제외**(D14): `meetings.withTime` 토글 off 기본, UI는 토글 보존 |
 | F9 | **모바일/웹 반응형** | 모바일 우선 설계 (카톡으로 들어오므로 모바일 트래픽 다수) |
 
 > ~~F8 타임존 처리~~ → **v1.1로 제외** (한국 단일 타겟이라 전원 KST, 글로벌 조율 전까진 불필요 — Braintrust 만장일치).
+> ~~F7 시간대 조율~~ → **v1.1로 제외** (디자인 `HAS_TIME=false`. MVP는 날짜+장소만. 코드/스키마는 토글로 보존 — D14).
 
 ### 3.2 패스트팔로우 (v1.1)
+- **시간대 조율(F7)** — `withTime` 토글 켜면 활성화. 날짜별 가용 시간 범위(AvailabilityGrid) + 시간 히트맵 집계. 스키마(TimeAvailability)·디자인 컴포넌트는 이미 존재.
+- **구글 로그인 추가** — provider 목록에 추가(Supabase 네이티브라 trivial). 카카오 연동(PoC②)이 본질적 난이도, 구글은 거의 공짜.
 - **타임존 처리** (F8 강등) — UTC 저장 + IANA tz, 글로벌 조율 시 활성화
 - 이메일 알림 (초대·마감임박·확정) — Resend + SPF/DKIM/DMARC
 - 캘린더 연동: Google/Outlook free/busy 조회, 확정 후 ICS 다운로드/이벤트 생성
@@ -195,7 +198,7 @@ Meeting                          # 기존 Event 계승
   - ownerUserId (nullable — 무가입 생성이면 null)
   - adminPin (nullable, 해시 저장 — 무가입 생성 시 필수, 관리자 인증용) ★신규
   - title, description
-  - type: DATE | PLACE | DATE_TIME | DATE_PLACE | ALL
+  - type: DATE | PLACE | DATE_PLACE          ★디자인 reconcile(D14): 3종으로 단순화
   - status: OPEN | CLOSED | CONFIRMED
   - timezone (IANA, v1.1 — v1은 "Asia/Seoul" 고정)
   - shareToken (게스트 참여용, 128bit 랜덤) ★128bit
@@ -217,7 +220,7 @@ Participant                      # 기존 EventMember 계승 + 게스트
 DateOption                       # 후보 날짜
   - id, meetingId, date
 
-TimeAvailability                 # 신규 — 시간대 조율 ("7시 이후")
+TimeAvailability                 # ⏸ v1.1 (MVP 제외 — D14). v1.1에서 마이그레이션으로 추가
   - id, participantId, dateOptionId
   - startMinUtc, endMinUtc (또는 가용 시간 범위)
 
@@ -297,7 +300,7 @@ Feedback                         # 기존 계승
 |------|------|-----------|
 | **S-1 (PoC, 0순위)** | 부록 A 미확인 항목 선검증: ① **카톡 인앱 브라우저**에서 Supabase Auth(카카오) 리다이렉트·localStorage 거동, ② Kakao 로그인↔Supabase 연동, ③ Kakao Map/Share/Local API 키·쿼터·도메인, ④ 서버 액션 PIN 검증+TTL 쿠키 패턴 | 인앱 브라우저에서 로그인·응답 식별 동작 확인, 차단 요소 문서화 |
 | **S0** | 프로젝트 스캐폴드 (Next.js+TS+Tailwind+shadcn, Supabase, Drizzle) | 빈 앱 Vercel 배포 성공 |
-| **S1** | 데이터 모델(adminPin/guestKey/editPin/shareToken 128bit/TTL 포함) + 마이그레이션 + **서버 액션 검증 + 로그인 한정 RLS** | 스키마 적용, 토큰/PIN 격리·TTL 테스트 통과 |
+| **S1** ✅ | 데이터 모델(adminPin/guestKey/editPin/shareToken 128bit/TTL 포함) + 마이그레이션 + 토큰 헬퍼 | ✅ 완료(2026-06-30): `schema.ts` 10테이블·`drizzle/0000_init.sql`·pglite 제약테스트 통과. **RLS는 S9로 연기**(D13) — 서버액션 검증은 S2~, 로그인 한정 RLS는 auth 컨텍스트 필요 |
 | **S2** | 폴 생성 위저드 (무가입+관리자 PIN, 날짜/시간/장소 후보) + 단일 shareToken 발급 | 무가입 생성·저장·조회 |
 | **S3** | 게스트 응답 (`/m/[shareToken]`, **When2meet식 닉네임+선택 PIN 서버 검증**, 투표) | 인앱 브라우저 포함 응답 제출/수정 동작 |
 | **S4** | 카톡 공유 (자동 멘트) | 공유 링크로 게스트 진입 |
@@ -305,7 +308,7 @@ Feedback                         # 기존 계승
 | **S6** | 주최자 관리(로그인/관리자 PIN+TTL 쿠키) + 결과 확정 + 반응형 | PIN 인증·확정 플로우, 모바일 검증 |
 | **S7** | 시간대 조율 ("7시 이후" 범위, 타임존 제외) | 시간 범위 응답·집계 |
 | **S8 (부가)** | 출발지 입력(옵셔널) → 중간지점/주변 추천 | centroid + 카카오 검색, 미입력 시 정상 동작 |
-| **S9** | **선택 소셜 로그인**(카카오·구글) + 내 모임 대시보드 + 게스트 merge | 로그인→내 모임 조회·연결 동작 |
+| **S9** | **선택 소셜 로그인**(v1 카카오만, provider 확장형) + 내 모임 대시보드 + 게스트 merge | 로그인→내 모임 조회·연결 동작. 제네릭 `signInWithProvider`·provider는 비-enum·merge는 user id 기준 |
 | **S10** (v1.1) | 타임존 + 이메일 알림 + 실시간 + 캘린더 | 알림 발송, 실시간 갱신 |
 
 > 순서 원칙: **S-1 PoC로 인앱 브라우저·연동 블로커를 먼저 제거**(0순위) → 무가입 핵심 경로(S2~S6)를 데모 가능 상태로 → 시간조율/중간지점(S7·S8 부가) → 로그인(S9)을 선택적으로 얹는다.
