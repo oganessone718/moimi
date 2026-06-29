@@ -1,26 +1,222 @@
 @import "tailwindcss";
 
+/* ============================================================
+   moimi 디자인 토큰 — Claude Design "moimi" 킷에서 포팅.
+   원본: tokens/{fonts,colors,typography,spacing,motion,base}.css
+   라이트 전용(디자인 base = light only).
+   ============================================================ */
+
+/* ---- Webfont: Pretendard Variable (오픈소스, jsDelivr CDN) ---- */
+@font-face {
+  font-family: "Pretendard Variable";
+  font-weight: 45 920;
+  font-style: normal;
+  font-display: swap;
+  src: url("https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/woff2/PretendardVariable.woff2")
+    format("woff2-variations");
+}
+
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  /* ---- Primary: 인디고/페리윙클 ---- */
+  --indigo-50: #eef0fe;
+  --indigo-100: #dfe2fd;
+  --indigo-200: #c3c8fb;
+  --indigo-300: #a2aaf8;
+  --indigo-400: #7b86f4;
+  --indigo-500: #5060ef; /* ★ Primary */
+  --indigo-600: #3b49d6;
+  --indigo-700: #2e39ab;
+  --indigo-800: #262f84;
+  --indigo-900: #1d2460;
+
+  /* ---- Accent: 코랄/피치 (정서적 포인트에만) ---- */
+  --accent-300: #ffa98f;
+  --accent-500: #ff7a59;
+  --accent-600: #f2602f;
+
+  /* ---- Sky: 정보/링크 보조 ---- */
+  --sky-50: #e5f2fe;
+  --sky-100: #cfeaff;
+  --sky-400: #3fa3ff;
+  --sky-500: #1e8ff5;
+  --sky-600: #0e72d1;
+
+  /* ---- 신호등 투표 3-state ---- */
+  --vote-yes: #16a34a;
+  --vote-yes-bg: #e7f7ec;
+  --vote-yes-text: #15803d;
+  --vote-maybe: #e59412;
+  --vote-maybe-bg: #fef3d6;
+  --vote-maybe-text: #b45309;
+  --vote-no: #e5484d;
+  --vote-no-bg: #fde8e8;
+  --vote-no-text: #c62a2f;
+
+  /* ---- 상태 시맨틱 ---- */
+  --success: #16a34a;
+  --success-bg: #e7f7ec;
+  --warning: #e59412;
+  --warning-bg: #fef3d6;
+  --error: #e5484d;
+  --error-bg: #fde8e8;
+  --info: #1e8ff5;
+  --info-bg: #e5f2fe;
+
+  /* ---- 중립 (쿨 슬레이트) ---- */
+  --white: #ffffff;
+  --gray-25: #fafbfd;
+  --gray-50: #f3f5f9;
+  --gray-100: #eaedf3;
+  --gray-200: #dce1ea;
+  --gray-300: #c7cedb;
+  --gray-400: #97a0b2;
+  --gray-500: #6a7382;
+  --gray-600: #4a515e;
+  --gray-700: #353a45;
+  --gray-800: #22262f;
+  --gray-900: #151821;
+
+  /* ---- 카카오 규격 ---- */
+  --kakao-yellow: #fee500;
+  --kakao-yellow-pressed: #ead400;
+  --kakao-label: #191600;
+
+  /* ---- 시맨틱 alias ---- */
+  --color-primary: var(--indigo-500);
+  --color-primary-hover: var(--indigo-600);
+  --color-primary-pressed: var(--indigo-700);
+  --color-primary-subtle: var(--indigo-50);
+  --color-on-primary: var(--white);
+  --color-accent: var(--accent-500);
+
+  --surface-app: var(--gray-25);
+  --surface-card: var(--white);
+  --surface-sunken: var(--gray-50);
+  --surface-raised: var(--white);
+
+  --text-strong: var(--gray-900);
+  --text-medium: var(--gray-600);
+  --text-weak: var(--gray-500);
+  --text-on-primary: var(--white);
+  --text-disabled: var(--gray-400);
+
+  --border-subtle: var(--gray-200);
+  --border-default: var(--gray-300);
+  --border-strong: var(--gray-400);
+  --border-focus: var(--indigo-500);
+
+  /* ---- Typography ---- */
+  --font-sans: "Pretendard Variable", Pretendard, -apple-system,
+    BlinkMacSystemFont, "Apple SD Gothic Neo", "Malgun Gothic", system-ui,
+    sans-serif;
+
+  --fw-regular: 400;
+  --fw-medium: 500;
+  --fw-semibold: 600;
+  --fw-bold: 700;
+  --fw-extrabold: 800;
+
+  --fs-display: 2.5rem;
+  --fs-h1: 2rem;
+  --fs-h2: 1.5rem;
+  --fs-h3: 1.25rem;
+  --fs-body-lg: 1.125rem;
+  --fs-body: 1rem;
+  --fs-body-sm: 0.875rem;
+  --fs-caption: 0.75rem;
+
+  --lh-tight: 1.2;
+  --lh-snug: 1.35;
+  --lh-normal: 1.5;
+  --ls-tight: -0.02em;
+  --ls-normal: -0.01em;
+
+  --text-display: var(--fw-extrabold) var(--fs-display) / var(--lh-tight)
+    var(--font-sans);
+  --text-h1: var(--fw-bold) var(--fs-h1) / var(--lh-tight) var(--font-sans);
+  --text-h2: var(--fw-bold) var(--fs-h2) / var(--lh-snug) var(--font-sans);
+  --text-h3: var(--fw-semibold) var(--fs-h3) / var(--lh-snug) var(--font-sans);
+  --text-body-lg: var(--fw-regular) var(--fs-body-lg) / var(--lh-normal)
+    var(--font-sans);
+  --text-body: var(--fw-regular) var(--fs-body) / var(--lh-normal)
+    var(--font-sans);
+  --text-body-strong: var(--fw-semibold) var(--fs-body) / var(--lh-normal)
+    var(--font-sans);
+  --text-body-sm: var(--fw-regular) var(--fs-body-sm) / var(--lh-normal)
+    var(--font-sans);
+  --text-caption: var(--fw-medium) var(--fs-caption) / var(--lh-snug)
+    var(--font-sans);
+
+  /* ---- Spacing / radius / shadow / layout ---- */
+  --space-1: 4px;
+  --space-2: 8px;
+  --space-3: 12px;
+  --space-4: 16px;
+  --space-6: 24px;
+  --space-8: 32px;
+  --space-12: 48px;
+
+  --radius-sm: 8px;
+  --radius-md: 12px;
+  --radius-lg: 16px;
+  --radius-xl: 20px;
+  --radius-full: 999px;
+
+  --shadow-sm: 0 1px 2px rgba(21, 24, 33, 0.06),
+    0 1px 3px rgba(21, 24, 33, 0.08);
+  --shadow-md: 0 2px 6px rgba(21, 24, 33, 0.06),
+    0 8px 20px rgba(21, 24, 33, 0.08);
+  --shadow-lg: 0 8px 16px rgba(21, 24, 33, 0.07),
+    0 20px 40px rgba(21, 24, 33, 0.12);
+  --shadow-primary: 0 6px 18px rgba(80, 96, 239, 0.38);
+
+  --touch-min: 44px;
+  --mobile-width: 390px;
+
+  /* ---- Motion ---- */
+  --duration-fast: 120ms;
+  --duration-base: 200ms;
+  --duration-slow: 320ms;
+  --ease-standard: cubic-bezier(0.2, 0, 0, 1);
+  --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
+  --ease-bounce: cubic-bezier(0.34, 1.56, 0.64, 1);
 }
 
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+/* ---- base resets ---- */
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+html {
+  -webkit-text-size-adjust: 100%;
 }
 
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  margin: 0;
+  font: var(--text-body);
+  color: var(--text-strong);
+  background: var(--surface-app);
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+
+p,
+li,
+h1,
+h2,
+h3,
+h4 {
+  word-break: keep-all;
+  text-wrap: pretty;
+}
+
+button {
+  font-family: inherit;
+}
+
+:focus-visible {
+  outline: 3px solid var(--indigo-300);
+  outline-offset: 2px;
 }
