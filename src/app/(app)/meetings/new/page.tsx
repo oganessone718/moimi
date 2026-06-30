@@ -9,7 +9,10 @@ import { PinInput } from "@/components/ui/PinInput";
 import { StepIndicator } from "@/components/ui/StepIndicator";
 import { PlaceCard } from "@/components/place/PlaceCard";
 import { ShareButton } from "@/components/share/ShareButton";
+import { createMeetingAction } from "@/server/meetings/actions";
 import styles from "./wizard.module.css";
+
+const TYPE_MAP = { both: "DATE_PLACE", date: "DATE", place: "PLACE" } as const;
 
 type MeetingType = "both" | "date" | "place";
 type NewPlace = { name: string; emoji: string; description?: string; location?: string };
@@ -109,9 +112,11 @@ export default function CreateWizardPage() {
   const i = Math.min(stepIndex, stepIds.length - 1);
   const id = stepIds[i];
 
-  // createMeeting 서버액션(S2)이 발급할 shareToken. 지금은 공유 스텝 진입 시 데모 토큰 생성.
-  const [demoToken, setDemoToken] = useState("");
-  const shareUrl = `moimi.app/m/${demoToken || "······"}`;
+  // createMeeting 서버액션(S2)이 발급하는 shareToken.
+  const [token, setToken] = useState("");
+  const [creating, setCreating] = useState(false);
+  const [error, setError] = useState("");
+  const shareUrl = `moimi.app/m/${token || "······"}`;
 
   const toggleDate = (d: string) =>
     setDates((s) => {
@@ -136,15 +141,32 @@ export default function CreateWizardPage() {
   const canNext =
     id === "basic" ? title.trim().length > 0 : id === "options" ? pin.length >= 4 : true;
   const isLastForm = id === "options";
-  const next = () => {
-    const ni = Math.min(i + 1, stepIds.length - 1);
-    // 공유 스텝 진입 시 데모 토큰 발급(실제 토큰은 createMeeting 서버액션 — S2).
-    if (stepIds[ni] === "share" && !demoToken) {
-      setDemoToken(Math.random().toString(36).slice(2, 8).toUpperCase());
-    }
-    setStepIndex(ni);
-  };
+  const next = () => setStepIndex((n) => Math.min(n + 1, stepIds.length - 1));
   const back = () => setStepIndex((n) => Math.max(n - 1, 0));
+
+  // 마지막 폼(옵션)에서 "모임 만들기" → createMeeting 서버액션 → 공유 스텝.
+  const submitCreate = async () => {
+    setCreating(true);
+    setError("");
+    try {
+      const { shareToken } = await createMeetingAction({
+        title,
+        type: TYPE_MAP[type],
+        dates: [...dates],
+        places: places.map((p) => ({ name: p.name })),
+        adminPin: pin,
+        deadline: deadline || null,
+        anonymousVote: anonymous,
+        allowGuestAddPlace,
+      });
+      setToken(shareToken);
+      setStepIndex(stepIds.indexOf("share"));
+    } catch {
+      setError("모임 생성에 실패했어요. 잠시 후 다시 시도해주세요.");
+    } finally {
+      setCreating(false);
+    }
+  };
 
   const TITLES: Record<string, [string, string]> = {
     basic: ["기본 정보", "어떤 모임인가요? 제목과 유형을 정해요."],
@@ -316,6 +338,11 @@ export default function CreateWizardPage() {
                 🔒 가입 없이 모임을 관리하려면 PIN이 꼭 필요해요. 잊지 마세요!
               </div>
             </div>
+            {error && (
+              <p className={styles.pinnote} style={{ color: "var(--vote-no-text)" }}>
+                ⚠️ {error}
+              </p>
+            )}
           </div>
         )}
 
@@ -346,7 +373,14 @@ export default function CreateWizardPage() {
 
       <div className={styles.actionbar}>
         {id === "share" ? (
-          <Button variant="primary" size="lg" block onClick={() => { window.location.href = `/m/${demoToken}`; }}>
+          <Button
+            variant="primary"
+            size="lg"
+            block
+            onClick={() => {
+              window.location.href = `/m/${token}`;
+            }}
+          >
             모임 현황 보러가기
           </Button>
         ) : (
@@ -356,8 +390,14 @@ export default function CreateWizardPage() {
                 뒤로
               </Button>
             )}
-            <Button variant="primary" size="lg" block disabled={!canNext} onClick={next}>
-              {isLastForm ? "모임 만들기 🙌" : "다음"}
+            <Button
+              variant="primary"
+              size="lg"
+              block
+              disabled={!canNext || creating}
+              onClick={isLastForm ? submitCreate : next}
+            >
+              {isLastForm ? (creating ? "만드는 중…" : "모임 만들기 🙌") : "다음"}
             </Button>
           </>
         )}
