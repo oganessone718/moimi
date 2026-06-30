@@ -220,3 +220,15 @@ button {
   outline: 3px solid var(--indigo-300);
   outline-offset: 2px;
 }
+
+/* 모션 최소화 선호 시 애니메이션/트랜지션 제거 (디자인 motion 토큰 정책) */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}

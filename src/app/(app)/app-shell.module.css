@@ -1,3 +1,11 @@
+/* 앱 화면 공통 셸. 모바일: full-bleed 단일 컬럼.
+   데스크탑/태블릿: 옅은 회색 페이지 위에 앱을 중앙 패널로 띄움(디자인의 중앙정렬 모델). */
+
+.page {
+  display: flex;
+  flex-direction: column;
+}
+
 .shell {
   width: 100%;
   max-width: 480px;
@@ -6,4 +14,20 @@
   display: flex;
   flex-direction: column;
   background: var(--surface-app);
+}
+
+@media (min-width: 600px) {
+  .page {
+    min-height: 100dvh;
+    background: var(--gray-100);
+    padding: 32px 16px;
+    align-items: center;
+  }
+  .shell {
+    min-height: calc(100dvh - 64px);
+    max-height: calc(100dvh - 64px);
+    border-radius: var(--radius-xl);
+    box-shadow: var(--shadow-lg);
+    overflow: hidden;
+  }
 }
