@@ -1,0 +1,162 @@
+/* 게스트 응답 화면 — 디자인 ui_kits/moimi/index.html 포팅 (핵심 투표 플로우). */
+
+.head {
+  flex: none;
+  padding: 14px 16px 12px;
+}
+.headRow {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.logo {
+  font: var(--fw-extrabold) 19px var(--font-sans);
+  color: var(--color-primary);
+  letter-spacing: -0.02em;
+  text-decoration: none;
+}
+.title {
+  font: var(--text-h2);
+  margin: 10px 0 6px;
+  color: var(--text-strong);
+}
+.sub {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.tabs {
+  display: flex;
+  gap: 4px;
+  margin: 0 16px;
+  padding: 4px;
+  background: var(--surface-sunken);
+  border-radius: var(--radius-md);
+  flex: none;
+}
+.tab {
+  flex: 1;
+  border: none;
+  background: transparent;
+  cursor: pointer;
+  padding: 9px 4px;
+  border-radius: var(--radius-sm);
+  min-height: 40px;
+  font: var(--fw-semibold) var(--fs-body-sm) / 1 var(--font-sans);
+  color: var(--text-medium);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 5px;
+}
+.tab[aria-selected="true"] {
+  background: var(--surface-card);
+  color: var(--color-primary);
+  box-shadow: var(--shadow-sm);
+}
+.cnt {
+  font-size: 11px;
+  opacity: 0.8;
+}
+
+.scroll {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  padding: 14px 16px 18px;
+  display: grid;
+  gap: 12px;
+  align-content: start;
+}
+.sectlabel {
+  font: var(--text-caption);
+  color: var(--text-weak);
+}
+
+.sumcard {
+  background: var(--surface-card);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-lg);
+  padding: 14px;
+  display: grid;
+  gap: 12px;
+}
+.sumrow {
+  display: flex;
+  gap: 10px;
+  align-items: flex-start;
+}
+.sumrow .k {
+  color: var(--text-medium);
+  font: var(--text-body-sm);
+  width: 64px;
+  flex: none;
+}
+.pills {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+.pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 4px 10px;
+  border-radius: var(--radius-full);
+  font: var(--fw-semibold) var(--fs-body-sm) / 1 var(--font-sans);
+  background: var(--indigo-50);
+  color: var(--indigo-700);
+}
+.pillYes {
+  background: var(--vote-yes-bg);
+  color: var(--vote-yes-text);
+}
+.pillMaybe {
+  background: var(--vote-maybe-bg);
+  color: var(--vote-maybe-text);
+}
+.muted {
+  color: var(--text-weak);
+  font: var(--text-body-sm);
+}
+
+.actionbar {
+  flex: none;
+  padding: 12px 16px calc(12px + env(safe-area-inset-bottom));
+  border-top: 1px solid var(--border-subtle);
+  background: var(--surface-card);
+  display: grid;
+  gap: 8px;
+}
+.hint {
+  font: var(--text-caption);
+  color: var(--text-medium);
+  text-align: center;
+}
+.err {
+  font: var(--text-caption);
+  color: var(--vote-no-text);
+  text-align: center;
+}
+
+/* join gate */
+.join {
+  flex: 1;
+  display: grid;
+  align-content: center;
+  gap: 16px;
+  padding: 24px 20px;
+}
+.joinTitle {
+  font: var(--text-h2);
+  color: var(--text-strong);
+  text-align: center;
+}
+.joinSub {
+  font: var(--text-body-sm);
+  color: var(--text-medium);
+  text-align: center;
+  margin-top: -8px;
+}
