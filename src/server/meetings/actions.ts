@@ -11,6 +11,11 @@ import {
   type SubmitResponseInput,
   type SubmitResponseResult,
 } from "./submitResponse";
+import {
+  confirmMeeting,
+  type ConfirmMeetingInput,
+  type ConfirmMeetingResult,
+} from "./confirmMeeting";
 
 export async function createMeetingAction(
   input: CreateMeetingInput,
@@ -22,4 +27,10 @@ export async function submitResponseAction(
   input: SubmitResponseInput,
 ): Promise<SubmitResponseResult> {
   return submitResponse(getDb(), input);
+}
+
+export async function confirmMeetingAction(
+  input: ConfirmMeetingInput,
+): Promise<ConfirmMeetingResult> {
+  return confirmMeeting(getDb(), input);
 }
