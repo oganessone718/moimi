@@ -299,13 +299,13 @@ Feedback                         # 기존 계승
 | Step | 내용 | 검증 기준 |
 |------|------|-----------|
 | **S-1 (PoC, 0순위)** | 부록 A 미확인 항목 선검증: ① **카톡 인앱 브라우저**에서 Supabase Auth(카카오) 리다이렉트·localStorage 거동, ② Kakao 로그인↔Supabase 연동, ③ Kakao Map/Share/Local API 키·쿼터·도메인, ④ 서버 액션 PIN 검증+TTL 쿠키 패턴 | 인앱 브라우저에서 로그인·응답 식별 동작 확인, 차단 요소 문서화 |
-| **S0** | 프로젝트 스캐폴드 (Next.js+TS+Tailwind+shadcn, Supabase, Drizzle) | 빈 앱 Vercel 배포 성공 |
+| **S0** ✅ | 프로젝트 스캐폴드 (Next.js+TS+Tailwind, Supabase, Drizzle) | ✅ Next16 스캐폴드·빌드 통과 (커밋 `6ce10ff`) |
 | **S1** ✅ | 데이터 모델(adminPin/guestKey/editPin/shareToken 128bit/TTL 포함) + 마이그레이션 + 토큰 헬퍼 | ✅ 완료(2026-06-30): `schema.ts` 10테이블·`drizzle/0000_init.sql`·pglite 제약테스트 통과. **RLS는 S9로 연기**(D13) — 서버액션 검증은 S2~, 로그인 한정 RLS는 auth 컨텍스트 필요 |
-| **S2** | 폴 생성 위저드 (무가입+관리자 PIN, 날짜/시간/장소 후보) + 단일 shareToken 발급 | 무가입 생성·저장·조회 |
-| **S3** | 게스트 응답 (`/m/[shareToken]`, **When2meet식 닉네임+선택 PIN 서버 검증**, 투표) | 인앱 브라우저 포함 응답 제출/수정 동작 |
-| **S4** | 카톡 공유 (자동 멘트) | 공유 링크로 게스트 진입 |
-| **S5** | 지도 시각화 (카카오맵, 장소 마커) | 후보 장소 지도 표시 |
-| **S6** | 주최자 관리(로그인/관리자 PIN+TTL 쿠키) + 결과 확정 + 반응형 | PIN 인증·확정 플로우, 모바일 검증 |
+| **S2** ✅ | 폴 생성 위저드 (무가입+관리자 PIN, 날짜/장소 후보) + 단일 shareToken 발급 | ✅ `/meetings/new` 5스텝 + `createMeeting` 서버액션. UI/로직 완료(DB 연결은 셋업 후) |
+| **S3** ✅ | 게스트 응답 (`/m/[shareToken]`, **When2meet식 닉네임+선택 PIN 서버 검증**, 투표) | ✅ 닉네임 게이트·날짜/장소 투표·제출(`submitResponse`)·결과(`/results`)·댓글. 인앱 브라우저 실검증은 배포 후 |
+| **S4** | 카톡 공유 (자동 멘트) | ⏸ Kakao SDK 키 필요 — ShareButton 자리만(현재 복사/스텁) |
+| **S5** | 지도 시각화 (카카오맵, 장소 마커) | ⏸ Kakao Map 키 필요 |
+| **S6** ✅(부분) | 주최자 관리(관리자 PIN+TTL 쿠키) + 결과 확정 + 반응형 | ✅ 게스트 화면 관리자 모드(PIN→쿠키, 마감·후보편집·확정 `/confirmed`)·모바일 우선. 로그인 소유자 경로는 S9 |
 | **S7** | 시간대 조율 ("7시 이후" 범위, 타임존 제외) | 시간 범위 응답·집계 |
 | **S8 (부가)** | 출발지 입력(옵셔널) → 중간지점/주변 추천 | centroid + 카카오 검색, 미입력 시 정상 동작 |
 | **S9** | **선택 소셜 로그인**(v1 카카오만, provider 확장형) + 내 모임 대시보드 + 게스트 merge | 로그인→내 모임 조회·연결 동작. 제네릭 `signInWithProvider`·provider는 비-enum·merge는 user id 기준 |
