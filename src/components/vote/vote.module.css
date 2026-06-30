@@ -1,0 +1,86 @@
+/* VoteCell — YES/MAYBE/NO 세그먼트 */
+.cell {
+  display: inline-flex;
+  gap: 6px;
+}
+.block {
+  display: flex;
+}
+.block .opt {
+  flex: 1;
+}
+.opt {
+  min-height: 44px;
+  padding: 0 12px;
+  border: 2px solid var(--border-subtle);
+  background: var(--surface-card);
+  border-radius: var(--radius-md);
+  font: var(--fw-semibold) var(--fs-body-sm) / 1 var(--font-sans);
+  color: var(--text-medium);
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 5px;
+  transition: border-color var(--duration-fast) var(--ease-standard),
+    background var(--duration-fast) var(--ease-standard);
+}
+.opt[data-on="true"][data-v="yes"] {
+  border-color: var(--vote-yes);
+  background: var(--vote-yes-bg);
+  color: var(--vote-yes-text);
+}
+.opt[data-on="true"][data-v="maybe"] {
+  border-color: var(--vote-maybe);
+  background: var(--vote-maybe-bg);
+  color: var(--vote-maybe-text);
+}
+.opt[data-on="true"][data-v="no"] {
+  border-color: var(--vote-no);
+  background: var(--vote-no-bg);
+  color: var(--vote-no-text);
+}
+
+/* DateCandidateCard */
+.card {
+  background: var(--surface-card);
+  border: 2px solid var(--border-subtle);
+  border-radius: var(--radius-lg);
+  padding: 14px;
+  display: grid;
+  gap: 12px;
+}
+.cardLead {
+  border-color: var(--indigo-300);
+  box-shadow: var(--shadow-md);
+}
+.head {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.date {
+  font: var(--text-body-strong);
+  color: var(--text-strong);
+}
+.dow {
+  font: var(--text-caption);
+  color: var(--text-medium);
+  margin-left: 2px;
+}
+.dow[data-d="일"] {
+  color: var(--error);
+}
+.dow[data-d="토"] {
+  color: var(--info);
+}
+.counts {
+  margin-left: auto;
+  display: flex;
+  gap: 10px;
+  font: var(--text-caption);
+  color: var(--text-medium);
+}
+.counts b {
+  color: var(--text-strong);
+}
