@@ -1,6 +1,7 @@
 import { notFound } from "next/navigation";
 import { getDb } from "@/lib/db";
 import { getMeetingByShareToken } from "@/server/meetings/getMeeting";
+import { getComments } from "@/server/meetings/comments";
 import { getAdminSession } from "@/lib/auth/admin-cookie";
 import { GuestResponse } from "./GuestResponse";
 
@@ -14,7 +15,10 @@ export default async function GuestPage({
   const data = await getMeetingByShareToken(getDb(), shareToken);
   if (!data) notFound();
 
-  const session = await getAdminSession(data.meeting.id);
+  const [session, comments] = await Promise.all([
+    getAdminSession(data.meeting.id),
+    getComments(getDb(), data.meeting.id),
+  ]);
 
   return (
     <GuestResponse
@@ -25,6 +29,7 @@ export default async function GuestPage({
       initialIsAdmin={!!session}
       dates={data.dateOptions.map((d) => ({ id: d.id, date: d.date }))}
       places={data.places.map((p) => ({ id: p.id, name: p.name, emoji: "📍" }))}
+      comments={comments}
     />
   );
 }

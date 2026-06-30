@@ -22,6 +22,7 @@ import * as admin from "./admin";
 import { authenticateAdmin, DEFAULT_TTL_MS } from "@/server/auth/authenticateAdmin";
 import { INITIAL_LOCKOUT } from "@/server/auth/lockout";
 import { getAdminSession, setAdminCookie } from "@/lib/auth/admin-cookie";
+import { addComment, type AddCommentInput } from "./comments";
 
 export async function createMeetingAction(
   input: CreateMeetingInput,
@@ -33,6 +34,12 @@ export async function submitResponseAction(
   input: SubmitResponseInput,
 ): Promise<SubmitResponseResult> {
   return submitResponse(getDb(), input);
+}
+
+export async function addCommentAction(
+  input: AddCommentInput,
+): Promise<{ ok: boolean }> {
+  return addComment(getDb(), input);
 }
 
 export async function confirmMeetingAction(

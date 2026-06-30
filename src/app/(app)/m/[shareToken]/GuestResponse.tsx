@@ -12,6 +12,7 @@ import { NicknameChip } from "@/components/people/NicknameChip";
 import { DateCandidateCard } from "@/components/vote/DateCandidateCard";
 import type { Vote } from "@/components/vote/VoteCell";
 import { PlaceCard } from "@/components/place/PlaceCard";
+import { CommentThread } from "./CommentThread";
 import {
   submitResponseAction,
   verifyAdminPinAction,
@@ -26,6 +27,7 @@ import styles from "./guest.module.css";
 
 type DateOpt = { id: string; date: string };
 type PlaceOpt = { id: string; name: string; emoji: string };
+type CommentRow = { id: string; target: "DATE" | "PLACE"; targetId: string; body: string; who: string };
 type Status = "OPEN" | "CLOSED" | "CONFIRMED";
 
 type Props = {
@@ -36,6 +38,7 @@ type Props = {
   initialIsAdmin: boolean;
   dates: DateOpt[];
   places: PlaceOpt[];
+  comments: CommentRow[];
 };
 
 const DOW = ["일", "월", "화", "수", "목", "금", "토"];
@@ -58,8 +61,11 @@ export function GuestResponse({
   initialIsAdmin,
   dates,
   places,
+  comments,
 }: Props) {
   const router = useRouter();
+  const commentsFor = (target: "DATE" | "PLACE", targetId: string) =>
+    comments.filter((c) => c.target === target && c.targetId === targetId);
   const [joined, setJoined] = useState(false);
   const [nickname, setNickname] = useState("");
   const [pin, setPin] = useState("");
@@ -299,6 +305,13 @@ export function GuestResponse({
                       </button>
                     </div>
                   )}
+                  <CommentThread
+                    shareToken={shareToken}
+                    nickname={nickname}
+                    target="DATE"
+                    targetId={d.id}
+                    comments={commentsFor("DATE", d.id)}
+                  />
                 </div>
               );
             })}
@@ -360,6 +373,13 @@ export function GuestResponse({
                     </button>
                   </div>
                 )}
+                <CommentThread
+                  shareToken={shareToken}
+                  nickname={nickname}
+                  target="PLACE"
+                  targetId={p.id}
+                  comments={commentsFor("PLACE", p.id)}
+                />
               </div>
             ))}
             {isAdmin && (

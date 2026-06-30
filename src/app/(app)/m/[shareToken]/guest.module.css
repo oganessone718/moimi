@@ -288,6 +288,57 @@
   margin: 0;
 }
 
+/* comments */
+.cmtToggle {
+  border: none;
+  background: none;
+  cursor: pointer;
+  font: var(--text-body-sm);
+  color: var(--text-medium);
+  padding: 6px 2px;
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+}
+.cmtToggle:hover {
+  color: var(--text-strong);
+}
+.cmtBox {
+  display: grid;
+  gap: 8px;
+  padding: 4px 2px 8px;
+}
+.cmt {
+  display: flex;
+  gap: 9px;
+  padding: 6px 0;
+  border-top: 1px solid var(--border-subtle);
+}
+.cmt:first-child {
+  border-top: none;
+}
+.cmtWho {
+  font: var(--fw-semibold) var(--fs-body-sm) / 1.2 var(--font-sans);
+  color: var(--text-strong);
+}
+.cmtBody {
+  font: var(--text-body-sm);
+  color: var(--text-medium);
+  margin-top: 1px;
+}
+.cmtForm {
+  display: flex;
+  gap: 8px;
+  align-items: flex-end;
+}
+.cmtForm .grow {
+  flex: 1;
+}
+.cmtEmpty {
+  font: var(--text-body-sm);
+  color: var(--text-weak);
+}
+
 /* join gate */
 .join {
   flex: 1;
