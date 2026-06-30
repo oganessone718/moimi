@@ -13,6 +13,7 @@ import { DateCandidateCard } from "@/components/vote/DateCandidateCard";
 import type { Vote } from "@/components/vote/VoteCell";
 import { PlaceCard } from "@/components/place/PlaceCard";
 import { CommentThread } from "./CommentThread";
+import { CalendarVote } from "./CalendarVote";
 import {
   submitResponseAction,
   verifyAdminPinAction,
@@ -71,6 +72,7 @@ export function GuestResponse({
   const [pin, setPin] = useState("");
 
   const [tab, setTab] = useState<"date" | "place" | "me">("date");
+  const [dateView, setDateView] = useState<"list" | "calendar">("list");
   const [votes, setVotes] = useState<Record<string, Vote>>({});
   const [likes, setLikes] = useState<Record<string, boolean>>({});
   const [submitting, setSubmitting] = useState(false);
@@ -273,12 +275,35 @@ export function GuestResponse({
       <div className={styles.scroll} key={tab}>
         {tab === "date" && (
           <>
-            <div className={styles.sectlabel}>가능한 날에 표시해주세요</div>
+            <div className={styles.segRow}>
+              <div className={styles.seg}>
+                <button aria-pressed={dateView === "list"} onClick={() => setDateView("list")}>
+                  리스트
+                </button>
+                <button aria-pressed={dateView === "calendar"} onClick={() => setDateView("calendar")}>
+                  캘린더
+                </button>
+              </div>
+              <span className={styles.sectlabel}>
+                {answered}/{dates.length} 가능
+              </span>
+            </div>
             {dates.length === 0 && <div className={styles.muted}>날짜 후보가 없어요</div>}
-            {dates.map((d) => {
-              const f = fmtDate(d.date);
-              return (
-                <div key={d.id}>
+            {dateView === "calendar" && dates.length > 0 && (
+              <CalendarVote
+                dates={dates}
+                votes={votes}
+                onVote={(id, v) => {
+                  setVotes((s) => ({ ...s, [id]: v }));
+                  setSubmitted(false);
+                }}
+              />
+            )}
+            {dateView === "list" &&
+              dates.map((d) => {
+                const f = fmtDate(d.date);
+                return (
+                  <div key={d.id}>
                   <DateCandidateCard
                     date={f.label}
                     weekday={f.weekday}

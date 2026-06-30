@@ -288,6 +288,93 @@
   margin: 0;
 }
 
+/* date view 세그먼트 토글 */
+.seg {
+  display: inline-flex;
+  gap: 2px;
+  padding: 3px;
+  background: var(--surface-sunken);
+  border-radius: var(--radius-full);
+}
+.seg button {
+  border: none;
+  background: transparent;
+  cursor: pointer;
+  padding: 6px 14px;
+  border-radius: 99px;
+  font: var(--fw-semibold) var(--fs-caption) / 1 var(--font-sans);
+  color: var(--text-medium);
+}
+.seg button[aria-pressed="true"] {
+  background: var(--surface-card);
+  color: var(--text-strong);
+  box-shadow: var(--shadow-sm);
+}
+.segRow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+/* 캘린더 투표 뷰 */
+.cal {
+  background: var(--surface-card);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-lg);
+  padding: 14px;
+  display: grid;
+  gap: 12px;
+}
+.calMon {
+  font: var(--text-body-strong);
+  color: var(--text-strong);
+  text-align: center;
+}
+.calDow {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+}
+.calDow span {
+  text-align: center;
+  font: var(--text-caption);
+  color: var(--text-weak);
+  padding: 3px 0;
+}
+.calDow .sun {
+  color: var(--error);
+}
+.calDow .sat {
+  color: var(--info);
+}
+.calGrid {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 4px;
+}
+.vcell {
+  min-height: 46px;
+  border: 2px solid var(--border-subtle);
+  background: var(--surface-card);
+  border-radius: var(--radius-md);
+  font: var(--fw-semibold) var(--fs-body-sm) / 1 var(--font-sans);
+  color: var(--text-strong);
+  cursor: pointer;
+  display: grid;
+  place-items: center;
+}
+.vcellDim {
+  border-color: transparent;
+  background: transparent;
+  color: var(--gray-300);
+  cursor: default;
+}
+.calHint {
+  font: var(--text-caption);
+  color: var(--text-medium);
+  text-align: center;
+  margin: 0;
+}
+
 /* comments */
 .cmtToggle {
   border: none;
