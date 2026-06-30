@@ -1,15 +1,27 @@
 "use client";
 
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { Button } from "@/components/ui/Button";
 import { Input } from "@/components/ui/Input";
 import { Badge } from "@/components/ui/Badge";
+import { Switch } from "@/components/ui/Switch";
+import { PinInput } from "@/components/ui/PinInput";
 import { NicknameChip } from "@/components/people/NicknameChip";
 import { DateCandidateCard } from "@/components/vote/DateCandidateCard";
 import type { Vote } from "@/components/vote/VoteCell";
 import { PlaceCard } from "@/components/place/PlaceCard";
-import { submitResponseAction } from "@/server/meetings/actions";
+import {
+  submitResponseAction,
+  verifyAdminPinAction,
+  adminAddDateAction,
+  adminDeleteDateAction,
+  adminAddPlaceAction,
+  adminDeletePlaceAction,
+  adminSetLockAction,
+  adminConfirmAction,
+} from "@/server/meetings/actions";
 import styles from "./guest.module.css";
 
 type DateOpt = { id: string; date: string };
@@ -20,6 +32,8 @@ type Props = {
   shareToken: string;
   title: string;
   status: Status;
+  type: "DATE" | "PLACE" | "DATE_PLACE";
+  initialIsAdmin: boolean;
   dates: DateOpt[];
   places: PlaceOpt[];
 };
@@ -36,7 +50,16 @@ const TONE: Record<Status, "live" | "closed" | "confirmed"> = {
   CONFIRMED: "confirmed",
 };
 
-export function GuestResponse({ shareToken, title, status, dates, places }: Props) {
+export function GuestResponse({
+  shareToken,
+  title,
+  status,
+  type,
+  initialIsAdmin,
+  dates,
+  places,
+}: Props) {
+  const router = useRouter();
   const [joined, setJoined] = useState(false);
   const [nickname, setNickname] = useState("");
   const [pin, setPin] = useState("");
@@ -48,7 +71,47 @@ export function GuestResponse({ shareToken, title, status, dates, places }: Prop
   const [submitted, setSubmitted] = useState(false);
   const [error, setError] = useState("");
 
+  // 관리자 모드
+  const [isAdmin, setIsAdmin] = useState(initialIsAdmin);
+  const [pinOpen, setPinOpen] = useState(false);
+  const [adminPin, setAdminPin] = useState("");
+  const [pinErr, setPinErr] = useState(false);
+  const [finalDate, setFinalDate] = useState<string | null>(null);
+  const [finalPlace, setFinalPlace] = useState<string | null>(null);
+  const [newDate, setNewDate] = useState("");
+  const [newPlace, setNewPlace] = useState("");
+
   const locked = status !== "OPEN";
+  const needsDate = type === "DATE" || type === "DATE_PLACE";
+  const needsPlace = type === "PLACE" || type === "DATE_PLACE";
+
+  const tryPin = async (value: string) => {
+    const res = await verifyAdminPinAction(shareToken, value);
+    if (res.ok) {
+      setIsAdmin(true);
+      setPinOpen(false);
+      setAdminPin("");
+      setPinErr(false);
+    } else {
+      setPinErr(true);
+      setAdminPin("");
+    }
+  };
+
+  const verifyDateChange =
+    (fn: () => Promise<void>) =>
+    async () => {
+      await fn();
+      router.refresh();
+    };
+  const adminConfirm = async () => {
+    await adminConfirmAction(
+      shareToken,
+      needsDate ? finalDate : null,
+      needsPlace ? finalPlace : null,
+    );
+    router.push(`/m/${shareToken}/confirmed`);
+  };
   const answered = Object.keys(votes).length;
   const likedCount = Object.values(likes).filter(Boolean).length;
   const canSubmit = answered > 0 && !locked;
@@ -126,11 +189,31 @@ export function GuestResponse({ shareToken, title, status, dates, places }: Prop
 
   return (
     <>
+      {isAdmin && (
+        <div className={styles.adminBanner}>
+          <b>🛠️ 관리 모드</b>
+          <span>후보 추가·삭제, 마감, 최종 확정을 할 수 있어요</span>
+          <button onClick={() => setIsAdmin(false)}>나가기</button>
+        </div>
+      )}
+
       <div className={styles.head}>
         <div className={styles.headRow}>
           <Link href="/" className={styles.logo}>
             moimi
           </Link>
+          {!isAdmin && (
+            <button
+              className={styles.adminBtn}
+              onClick={() => {
+                setAdminPin("");
+                setPinErr(false);
+                setPinOpen(true);
+              }}
+            >
+              🔒 관리자
+            </button>
+          )}
         </div>
         <h1 className={styles.title}>{title}</h1>
         <div className={styles.sub}>
@@ -152,6 +235,35 @@ export function GuestResponse({ shareToken, title, status, dates, places }: Prop
         </button>
       </div>
 
+      {isAdmin && (
+        <div className={styles.adminPanel}>
+          <div className={styles.adminCtl}>
+            <div>
+              <b>투표 마감</b>
+              <span>{locked ? "마감됨 — 참가자는 투표할 수 없어요" : "켜면 더 이상 투표할 수 없어요"}</span>
+            </div>
+            <Switch
+              checked={locked}
+              onChange={(v) => adminSetLockAction(shareToken, v).then(() => router.refresh())}
+            />
+          </div>
+          <Button
+            variant="primary"
+            size="md"
+            block
+            disabled={(needsDate && !finalDate) || (needsPlace && !finalPlace)}
+            onClick={adminConfirm}
+          >
+            🎉 최종 {needsDate ? "날짜" : ""}
+            {needsDate && needsPlace ? "·" : ""}
+            {needsPlace ? "장소" : ""} 확정하기
+          </Button>
+          {((needsDate && !finalDate) || (needsPlace && !finalPlace)) && (
+            <span className={styles.hint}>아래에서 ⭐ 최종 후보를 골라주세요</span>
+          )}
+        </div>
+      )}
+
       <div className={styles.scroll} key={tab}>
         {tab === "date" && (
           <>
@@ -160,18 +272,58 @@ export function GuestResponse({ shareToken, title, status, dates, places }: Prop
             {dates.map((d) => {
               const f = fmtDate(d.date);
               return (
-                <DateCandidateCard
-                  key={d.id}
-                  date={f.label}
-                  weekday={f.weekday}
-                  value={votes[d.id] ?? null}
-                  onChange={(v) => {
-                    setVotes((s) => ({ ...s, [d.id]: v }));
-                    setSubmitted(false);
-                  }}
-                />
+                <div key={d.id}>
+                  <DateCandidateCard
+                    date={f.label}
+                    weekday={f.weekday}
+                    value={votes[d.id] ?? null}
+                    onChange={(v) => {
+                      setVotes((s) => ({ ...s, [d.id]: v }));
+                      setSubmitted(false);
+                    }}
+                  />
+                  {isAdmin && (
+                    <div className={styles.adminRow}>
+                      <button
+                        className={styles.adminPick}
+                        data-on={finalDate === d.id}
+                        onClick={() => setFinalDate(d.id)}
+                      >
+                        {finalDate === d.id ? "⭐ 최종 날짜" : "☆ 최종으로"}
+                      </button>
+                      <button
+                        className={styles.adminDel}
+                        onClick={verifyDateChange(() => adminDeleteDateAction(shareToken, d.id))}
+                      >
+                        🗑️ 삭제
+                      </button>
+                    </div>
+                  )}
+                </div>
               );
             })}
+            {isAdmin && (
+              <div className={styles.adminAdd}>
+                <div className={styles.grow} style={{ flex: 1 }}>
+                  <Input
+                    type="date"
+                    value={newDate}
+                    onChange={(e) => setNewDate(e.target.value)}
+                  />
+                </div>
+                <Button
+                  variant="secondary"
+                  disabled={!newDate}
+                  onClick={async () => {
+                    await adminAddDateAction(shareToken, newDate);
+                    setNewDate("");
+                    router.refresh();
+                  }}
+                >
+                  ＋ 추가
+                </Button>
+              </div>
+            )}
           </>
         )}
 
@@ -180,18 +332,58 @@ export function GuestResponse({ shareToken, title, status, dates, places }: Prop
             <div className={styles.sectlabel}>마음에 드는 곳에 하트를 눌러주세요</div>
             {places.length === 0 && <div className={styles.muted}>장소 후보가 없어요</div>}
             {places.map((p) => (
-              <PlaceCard
-                key={p.id}
-                name={p.name}
-                emoji={p.emoji}
-                liked={!!likes[p.id]}
-                showComments={false}
-                onToggleLike={() => {
-                  setLikes((s) => ({ ...s, [p.id]: !s[p.id] }));
-                  setSubmitted(false);
-                }}
-              />
+              <div key={p.id}>
+                <PlaceCard
+                  name={p.name}
+                  emoji={p.emoji}
+                  liked={!!likes[p.id]}
+                  showComments={false}
+                  onToggleLike={() => {
+                    setLikes((s) => ({ ...s, [p.id]: !s[p.id] }));
+                    setSubmitted(false);
+                  }}
+                />
+                {isAdmin && (
+                  <div className={styles.adminRow}>
+                    <button
+                      className={styles.adminPick}
+                      data-on={finalPlace === p.id}
+                      onClick={() => setFinalPlace(p.id)}
+                    >
+                      {finalPlace === p.id ? "⭐ 최종 장소" : "☆ 최종으로"}
+                    </button>
+                    <button
+                      className={styles.adminDel}
+                      onClick={verifyDateChange(() => adminDeletePlaceAction(shareToken, p.id))}
+                    >
+                      🗑️ 삭제
+                    </button>
+                  </div>
+                )}
+              </div>
             ))}
+            {isAdmin && (
+              <div className={styles.adminAdd}>
+                <div className={styles.grow} style={{ flex: 1 }}>
+                  <Input
+                    placeholder="장소 이름"
+                    value={newPlace}
+                    onChange={(e) => setNewPlace(e.target.value)}
+                  />
+                </div>
+                <Button
+                  variant="secondary"
+                  disabled={!newPlace.trim()}
+                  onClick={async () => {
+                    await adminAddPlaceAction(shareToken, newPlace);
+                    setNewPlace("");
+                    router.refresh();
+                  }}
+                >
+                  ＋ 추가
+                </Button>
+              </div>
+            )}
           </>
         )}
 
@@ -237,23 +429,52 @@ export function GuestResponse({ shareToken, title, status, dates, places }: Prop
         )}
       </div>
 
-      <div className={styles.actionbar}>
-        {error && <span className={styles.err}>⚠️ {error}</span>}
-        {locked ? (
-          <span className={styles.hint}>🔒 투표가 마감됐어요</span>
-        ) : !canSubmit ? (
-          <span className={styles.hint}>날짜를 하나 이상 골라야 제출할 수 있어요</span>
-        ) : null}
-        <Button
-          variant="primary"
-          size="lg"
-          block
-          disabled={!canSubmit || submitting}
-          onClick={submit}
-        >
-          {submitting ? "제출 중…" : submitted ? "제출 완료 · 다시 제출" : "제출하기"}
-        </Button>
-      </div>
+      {!isAdmin && (
+        <div className={styles.actionbar}>
+          {error && <span className={styles.err}>⚠️ {error}</span>}
+          {locked ? (
+            <span className={styles.hint}>🔒 투표가 마감됐어요</span>
+          ) : !canSubmit ? (
+            <span className={styles.hint}>날짜를 하나 이상 골라야 제출할 수 있어요</span>
+          ) : null}
+          <Button
+            variant="primary"
+            size="lg"
+            block
+            disabled={!canSubmit || submitting}
+            onClick={submit}
+          >
+            {submitting ? "제출 중…" : submitted ? "제출 완료 · 다시 제출" : "제출하기"}
+          </Button>
+          {submitted && (
+            <Link href={`/m/${shareToken}/results`} className={styles.resultsLink}>
+              📊 전체 결과 보기
+            </Link>
+          )}
+        </div>
+      )}
+
+      {pinOpen && (
+        <div className={styles.backdrop} onClick={() => setPinOpen(false)}>
+          <div className={styles.modal} onClick={(e) => e.stopPropagation()}>
+            <div className={styles.modalTitle}>관리자 인증</div>
+            <p className={styles.modalText}>
+              모임을 만들 때 정한 <b>관리 PIN 4자리</b>를 입력하세요
+            </p>
+            <PinInput
+              length={4}
+              value={adminPin}
+              error={pinErr}
+              onChange={(v) => {
+                setAdminPin(v);
+                setPinErr(false);
+              }}
+              onComplete={(v) => tryPin(v)}
+            />
+            {pinErr && <span className={styles.err}>PIN이 일치하지 않아요</span>}
+          </div>
+        </div>
+      )}
     </>
   );
 }
