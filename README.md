@@ -10,6 +10,7 @@
 ## 문서 (여기부터)
 | 문서 | 용도 |
 |------|------|
+| [docs/HANDOFF.md](docs/HANDOFF.md) | **현재 진행 상태 + 이어가기 (다른 세션/컴퓨터 인계용)** |
 | [KICKOFF.md](KICKOFF.md) | 새 Claude Code 세션 시작용 프롬프트 (설정/백엔드 트랙) |
 | [docs/PLAN.md](docs/PLAN.md) | 구현 플랜 — 기능·아키텍처·데이터 모델·로드맵(S-1~S10) |
 | [docs/DECISIONS.md](docs/DECISIONS.md) | 확정/미확정 결정 로그 |
